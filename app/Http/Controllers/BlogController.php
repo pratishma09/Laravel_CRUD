@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Contracts\Service\Attribute\Required;
 
+use function PHPUnit\Framework\fileExists;
+
 class BlogController extends Controller
 {
     public function index(){
@@ -21,17 +23,17 @@ class BlogController extends Controller
     public function store(Request $request){
 
         $request->validate([
-            'name'=>['required','string'],
+            'name'=>['required','string','unique:blogs,name'],
             'description'=>'required',
             'excerpt'=>'required',
             'slug'=> 'required',
-            'img'=>'required|mimes:jpg,jpeg,gif,bmp,png'
+            'img'=>'required|mimes:jpg,jpeg,png'
         ]);
         $filename='';
 
     if($request->hasFile('img')){
         $filename=time() . '.' . $request->img->getClientOriginalExtension(); 
-        $request->img->move(public_path('/assets/img'), $filename);
+        $request->img->move(public_path('assets'), $filename);
     }
         $blog=new Blog;
         $blog->name = $request->name;
@@ -49,19 +51,21 @@ class BlogController extends Controller
     }
 
     public function update($id, Request $request){
+        //this hadn't worked as enctype was not provided there
         $request->validate([
-            'name'=>['required','string'],
+            'name'=>['required','string','unique:blogs,name'],
             'description'=>'required',
             'excerpt'=>'required',
             'slug'=> 'required',
-            'image'=>'nullable|mimes:jpg,jpeg,gif,bmp,png'
+            'img'=>'nullable|mimes:jpg,jpeg,png'
         ]);
         $blog=Blog::where('id',$id)->first();
-        // dd($request);
-        if(isset($request->img)){
-            $filename=time() . '.' . $request->img->extension(); 
-            $request->img->move(public_path('/assets/img'), $filename);
+        if(file_exists($request->img)){
+            $filename=time() . '.' . $request->img->getClientOriginalExtension(); 
+            $request->img->move(public_path('assets'), $filename);
+            
             $blog->image=$filename;
+            
         }
        
         $blog->name = $request->name;

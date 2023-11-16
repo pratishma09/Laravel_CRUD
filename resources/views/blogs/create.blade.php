@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
+@extends('layout')
+@section('title','Blogs Today')
+@section('content')
     <h1>Create a blog post.</h1>
     <div>
         @if($errors->any())
@@ -41,5 +36,4 @@
         <button type="submit" class="btn btn-primary">Submit</button>
         
     </form>
-</body>
-</html>
+@endsection
